@@ -14,12 +14,17 @@ config.ini - file with configuration that defines how it should be enriched and 
 ### Sample of config
 
 [original]
+
 delimiter = ,
 
 [customer_info]
+
 file = customer_data.csv
+
 original_column = customer_id
+
 enrichment_column = cust_id
+
 delimiter = ,
 
 ### Explanation
