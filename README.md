@@ -1,4 +1,4 @@
-### CSV Enrichment tool
+# CSV Enrichment tool
 Created for internal usage
 
 Enriches "original file" with columns from "enrichment files" using defined columns as "linking keys"
@@ -11,7 +11,7 @@ config.ini - file with configuration that defines how it should be enriched and 
 
 ## Config file
 
-# Sample of config
+### Sample of config
 
 [original]
 delimiter = ,
@@ -22,7 +22,7 @@ original_column = customer_id
 enrichment_column = cust_id
 delimiter = ,
 
-# Explanation
+### Explanation
 
 Block [original] describes what delimiter we will use in the file that we want to enrich
 
