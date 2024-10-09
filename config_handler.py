@@ -1,4 +1,6 @@
 import configparser
+import glob
+import os
 
 def load_config(config_file):
     config = configparser.ConfigParser()
@@ -30,9 +32,18 @@ def load_config(config_file):
     }
 
     for block in enrichment_blocks:
+        file_pattern = config[block]['file']
+        matching_files = glob.glob(file_pattern)
+        
+        if not matching_files:
+            raise ValueError(f"No files found matching pattern '{file_pattern}' for block '{block}'")
+        
+        # Sort the matching files and select the last one (most recent)
+        file_to_use = sorted(matching_files)[-1]
+
         config_dict['enrichment_blocks'].append({
             'name': block,
-            'file': config[block]['file'],
+            'file': file_to_use,  # Use the most recent file
             'original_column': config[block]['original_column'],
             'enrichment_column': config[block]['enrichment_column'],
             'delimiter': config[block]['delimiter']

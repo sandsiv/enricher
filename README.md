@@ -4,7 +4,7 @@ Created for internal usage
 Enriches "original file" with columns from "enrichment files" using defined columns as "linking keys"
 
 ## How to run
-/ python csv_enrichment_main.py original_data.csv config.ini /
+*python csv_enrichment_main.py original_data.csv config.ini*
 
 original_data.csv - file than need to be enriched from connected dictionaries
 config.ini - file with configuration that defines how it should be enriched and from what sources
@@ -34,6 +34,8 @@ Block [original] describes what delimiter we will use in the file that we want t
 Other blocks are blocks that describes dictionary files for enrichment of original file.
 "original_column" defiles the name of column in the original file that used as "key", while 
 "enrichment_column" is the name of linked column in enrichment dictionary "file".
+
+"file" supports wildcard in names, in this case it will search for the **last** file that matche this pattern sorted by name
 
 There can be as many separate blocks for enrichment with different files.
 
