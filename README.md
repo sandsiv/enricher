@@ -8,8 +8,11 @@ A flexible Python tool for enriching CSV files with data from multiple sources. 
 - Support for different delimiters in source files
 - Flexible column mapping between original and enrichment files
 - Pattern matching support for enrichment file names
+- Static value addition for missing columns
+- Multi-column mapping support
 - Detailed warning messages for unsuccessful mappings
 - Configuration-driven approach using INI files
+- No external dependencies - uses only Python standard library
 
 ## Installation
 
@@ -19,16 +22,7 @@ git clone https://github.com/sandsiv/enricher.git
 cd enricher
 ```
 
-2. Set up a virtual environment (optional but recommended):
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows use: venv\Scripts\activate
-```
-
-3. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
+2. The tool uses only Python standard library (no additional dependencies required)
 
 ## Usage
 
@@ -45,34 +39,65 @@ Create a `config.ini` file with your enrichment settings:
 ```ini
 [original]
 delimiter = ,
+language = EN            # Static value - will be added to all rows
+region = EMEA           # Another static value example
 
 [customer_info]
-file = customer_data_*.csv
-original_column = customer_id
-enrichment_column = cust_id
+file = customer_data.csv
+original_columns = customer_id
+enrichment_columns = cust_id
 delimiter = ,
 
 [product_details]
-file = product_catalog_*.csv
-original_column = product_code
-enrichment_column = item_code
+file = product_catalog.csv
+original_columns = product_code
+enrichment_columns = item_code
 delimiter = ;
+
+[multi_column_example]
+file = survey.csv
+original_columns = product_code, supplier_id
+enrichment_columns = item_code, vendor_id
+delimiter = ,
 ```
+
+### Static Values
+
+The tool supports adding static values through the `[original]` section:
+- Any key in `[original]` section except 'delimiter' is treated as a column name
+- The corresponding value will be added to all rows
+- If the column already exists in the data, static value will only be applied to empty cells
+- Useful for adding constant values like language, region, or system identifiers
+
+### Multi-Column Mapping
+
+For scenarios where matching needs to be done on multiple columns:
+- Use comma-separated lists in `original_columns` and `enrichment_columns`
+- The number of columns must match between original and enrichment
+- Mapping is one-to-one in order (first to first, second to second, etc.)
+- All specified columns must exist in respective files
 
 ### Example Data Files
 
 Original file (`original_data.csv`):
 ```csv
-customer_id,product_code,order_date,quantity
-C001,P101,2023-01-15,5
-C002,P102,2023-01-16,3
+customer_id,product_code,supplier_id,order_date,quantity
+C001,P101,S01,2023-01-15,5
+C002,P102,S02,2023-01-16,3
 ```
 
-Enrichment file (`customer_data_20230515.csv`):
+Customer enrichment file (`customer_data.csv`):
 ```csv
 cust_id,customer_name,email,country
 C001,John Doe,john.doe@example.com,USA
 C002,Jane Smith,jane.smith@example.com,Canada
+```
+
+Multi-column enrichment file (`survey.csv`):
+```csv
+item_code,vendor_id,SURVEY_ID
+P101,S01,1
+P102,S02,2
 ```
 
 ## File Pattern Support
@@ -97,16 +122,12 @@ The tool provides detailed warning messages for:
 - Missing columns in the original file
 - Empty mapping values
 - Unmatched values in enrichment files
+- Invalid column mappings
 
 Example warning message:
 ```
-WARNING: Enrichment block 'customer_info': No matching value found in enrichment file 'customer_data_20230515.csv' for 'cust_id' = 'C999'
+WARNING: Enrichment block 'customer_info': No matching value found in enrichment file 'customer_data.csv' for 'cust_id' = 'C999'
 ```
-
-## Requirements
-
-- Python 3.x
-- Standard Python libraries (no additional dependencies)
 
 ## Project Structure
 
@@ -116,7 +137,6 @@ csv_enrichment/
 ├── config_handler.py        # Configuration processing
 ├── csv_utils.py            # CSV operations
 ├── enrichment_processor.py  # Core logic
-├── requirements.txt        # Dependencies
 ├── config.ini             # Configuration
 └── README.md              # This file
 ```
@@ -139,16 +159,6 @@ csv_enrichment/
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Author
-
-Your Name - [your.email@example.com](mailto:your.email@example.com)
-
-## Acknowledgments
-
-- List any inspirations, code snippets, etc.
-- Credits to other projects or individuals
-- Links to similar projects or resources
 
 ## Support
 
