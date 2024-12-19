@@ -10,6 +10,7 @@ A flexible Python tool for enriching CSV files with data from multiple sources. 
 - Pattern matching support for enrichment file names
 - Static value addition for missing columns
 - Multi-column mapping support
+- Default values for missing data in mapping columns
 - Detailed warning messages for unsuccessful mappings
 - Configuration-driven approach using INI files
 - No external dependencies - uses only Python standard library
@@ -60,6 +61,20 @@ original_columns = product_code, supplier_id
 enrichment_columns = item_code, vendor_id
 delimiter = ,
 ```
+
+### Default Values in Column Mapping
+
+The tool supports default values for empty cells in original columns using the `::` syntax. When a cell in the original file is empty or contains only whitespace, the specified default value will be used for enrichment mapping.
+
+Format: `column_name::default_value`
+
+Example configuration:
+```ini
+[product_details]
+file = product_catalog.csv
+original_columns = product_code::"ABC-123", supplier_id::S001, category
+enrichment_columns = item_code, vendor_id, cat_name
+delimiter = ,
 
 ### Static Values
 

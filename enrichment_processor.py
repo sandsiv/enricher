@@ -32,7 +32,8 @@ def process_enrichment(original_file, config):
         )
         
         # Validate all original columns exist
-        missing_columns = [col for col in block['original_columns'] if col not in original_data[0]]
+        missing_columns = [col_info['column'] for col_info in block['original_columns'] 
+                         if col_info['column'] not in original_data[0]]
         if missing_columns:
             logging.warning(
                 f"Enrichment block '{block['name']}': Original columns {missing_columns} "
@@ -42,14 +43,25 @@ def process_enrichment(original_file, config):
         
         # Process each row in original data
         for row in original_data:
-            # Get values from original columns for mapping
-            original_values = tuple(row[col] for col in block['original_columns'])
+            # Get values from original columns for mapping, using defaults if needed
+            original_values = []
+            used_defaults = False
+            
+            for col_info in block['original_columns']:
+                value = row[col_info['column']]
+                # Use default value if current value is empty and default is provided
+                if (not value or value.strip() == '') and col_info['default'] is not None:
+                    value = col_info['default']
+                    used_defaults = True
+                original_values.append(value)
+            
+            original_values = tuple(original_values)
             
             # Check if any mapping value is empty
             if any(not val for val in original_values):
                 logging.warning(
                     f"Enrichment block '{block['name']}': Empty mapping value in "
-                    f"original file for columns {block['original_columns']}. "
+                    f"original file for columns {[col_info['column'] for col_info in block['original_columns']]}. "
                     f"Skipping enrichment for this row."
                 )
                 continue
@@ -61,10 +73,15 @@ def process_enrichment(original_file, config):
                 for key, value in enrichment_row.items():
                     if key not in block['enrichment_columns']:
                         row[key] = value
+                if used_defaults:
+                    logging.info(
+                        f"Enrichment block '{block['name']}': Used default values for mapping in row: "
+                        f"{dict(zip([col_info['column'] for col_info in block['original_columns']], original_values))}"
+                    )
             else:
                 logging.warning(
                     f"Enrichment block '{block['name']}': No matching values found in "
-                    f"enrichment file '{block['file']}' for {dict(zip(block['original_columns'], original_values))}. "
+                    f"enrichment file '{block['file']}' for {dict(zip([col_info['column'] for col_info in block['original_columns']], original_values))}. "
                     f"Skipping enrichment for this row."
                 )
     
