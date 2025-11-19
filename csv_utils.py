@@ -13,11 +13,23 @@ def write_csv(file_path, data, delimiter):
     if not data:
         return
 
+    # 1. Collect all unique column names from ALL rows, not just the first one
+    all_fieldnames = set()
+    for row in data:
+        all_fieldnames.update(row.keys())
+
+    # 2. create a list for the header (keeping the order of the first row for neatness)
+    fieldnames = list(data[0].keys())
+    for name in all_fieldnames:
+        if name not in fieldnames:
+            fieldnames.append(name)
+
+    # 3. Write the file using the complete list of fieldnames
     with open(file_path, 'w', newline='') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=data[0].keys(), delimiter=delimiter)
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter=delimiter)
         writer.writeheader()
         writer.writerows(data)
-
+        
 def load_enrichment_data(file_path, delimiter, mapping_columns):
     """
     Load enrichment data with support for multi-column mapping
