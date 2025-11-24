@@ -1,0 +1,20 @@
+version: 2
+updates:
+  - package-ecosystem: "docker"
+    directory: "/"
+    target-branch: "main"
+    open-pull-requests-limit: 3
+    schedule:
+      interval: "monthly"
+    assignees:
+      - "Sergius71"
+    allow:
+      - dependency-type: "all"
+    commit-message:
+      prefix: "Docker"
+    rebase-strategy: "auto"
+    ignore:
+      - dependency-name: "python"
+        versions:
+          - ">= 3.13.0"
+          - "< 3.12.0"
