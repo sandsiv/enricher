@@ -5,7 +5,9 @@ updates:
     target-branch: "main"
     open-pull-requests-limit: 3
     schedule:
-      interval: "monthly"
+      interval: "weekly"
+      day: "sunday"
+      time: "23:25"
     assignees:
       - "Sergius71"
     allow:
